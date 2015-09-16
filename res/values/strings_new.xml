@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lbl_location">Location Name</string>
+    <string name="lbl_address">Jl. Iskandar Muda</string>
+    <string name="lbl_kategori">Ketegori : Halal</string>
+    <string name="img_location">Location image</string>
+    
+</resources>

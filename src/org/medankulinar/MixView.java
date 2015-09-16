@@ -37,6 +37,7 @@ import org.medankulinar.data.DataHandler;
 import org.medankulinar.data.DataSourceList;
 import org.medankulinar.data.DataSourceStorage;
 import org.medankulinar.event.ListEventActivity;
+import org.medankulinar.event.ListPoiActivity;
 import org.medankulinar.R;
 import org.medankulinar.R.drawable;
 import org.mixare.lib.gui.PaintScreen;

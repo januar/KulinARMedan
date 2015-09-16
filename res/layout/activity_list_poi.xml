@@ -1,16 +1,41 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingLeft="@dimen/activity_horizontal_padding"
     android:paddingRight="@dimen/activity_horizontal_padding"
-    tools:context="org.medankulinar.ListPoiActivity" >
+    tools:context="org.medankulinar.event.ListPoiActivity" >
 	
-    <ListView
-        android:id="@+id/list_location"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ProgressBar
+                android:id="@+id/inbox_progressbar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:indeterminateTintMode="src_in"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+    
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-</ListView>
-</LinearLayout>
+        <ListView
+            android:id="@+id/list_location"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </ListView>
+    </LinearLayout>
+
+</RelativeLayout>

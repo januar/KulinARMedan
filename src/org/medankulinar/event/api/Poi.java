@@ -9,8 +9,8 @@ public class Poi {
 	private String descrip;
 	private String kategori;
 	private String address;
-	private long lat;
-	private long lon;
+	private Float lat;
+	private Float lon;
 	private String img;
 	private String phone;
 	private String mail;
@@ -68,19 +68,19 @@ public class Poi {
 		this.address = address;
 	}
 
-	public long getLat() {
+	public Float getLat() {
 		return lat;
 	}
 
-	public void setLat(long lat) {
+	public void setLat(Float lat) {
 		this.lat = lat;
 	}
 
-	public long getLon() {
+	public Float getLon() {
 		return lon;
 	}
 
-	public void setLon(long lon) {
+	public void setLon(Float lon) {
 		this.lon = lon;
 	}
 
@@ -117,7 +117,7 @@ public class Poi {
 	}
 	
 	public class ListPoi{
-		public List<Poi> listPoi;
+		public Poi[] listPoi;
 		
 		public ListPoi() {
 		}

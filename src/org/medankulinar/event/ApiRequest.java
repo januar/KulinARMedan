@@ -29,6 +29,7 @@ public class ApiRequest {
 	
 	public static final int GET = 0;
 	public static final int POST = 1;
+	public static String LOG = "";
 
 	// constructor
 	public ApiRequest() {
@@ -94,10 +95,10 @@ public class ApiRequest {
 
 	// function get json from url
 	// by making HTTP POST or GET mehtod
-	public static String makeHttpRequest(String url, int method,
+	public static String makeHttpRequest(String request, int method,
 			List<NameValuePair> params) {
 
-		// Making HTTP request
+		String url = AppConfig.SERVER + request;
 		try {
 
 			// check for request method
@@ -125,26 +126,28 @@ public class ApiRequest {
 			}
 
 		} catch (UnsupportedEncodingException e) {
-
-			e.getMessage();
+			Log.e("RestAPI", e.getMessage());
+			LOG = e.getMessage();
 		} catch (ClientProtocolException e) {
-			e.getMessage();
+			Log.e("RestAPI", e.getMessage());
+			LOG = e.getMessage();
 		} catch (IOException e) {
-			e.getMessage();
+			Log.e("RestAPI", e.getMessage());
+			LOG = e.getMessage();
 		}
 
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					is, "iso-8859-1"), 8);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			StringBuilder sb = new StringBuilder();
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
+				sb.append(line);
 			}
 			is.close();
 			json = sb.toString();
 		} catch (Exception e) {
 			Log.e("Buffer Error", "Error converting result " + e.toString());
+			LOG = e.getMessage();
 		}
 
 		// try parse the string to a JSON object
