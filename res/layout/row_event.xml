@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+	<ImageView
+		android:id="@+id/imgAvatar"
+		android:layout_width="70dip"
+		android:layout_height="70dip"
+		android:scaleType="fitCenter"
+		android:src="@drawable/logo"	
+	/> 
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+	>
+	
+		<TextView
+			android:id="@+id/tvJudul"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"			
+			android:textStyle="bold"
+			android:textSize="18sp"
+			
+		/>
+		
+		<TextView
+			android:id="@+id/tvWaktu"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"			
+		/>
+		<TextView
+			android:id="@+id/tvLokasi"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"			
+		/>
+		
+		<TextView
+			android:id="@+id/tveventID"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"	
+			android:visibility="gone"		
+		/>
+		
+	</LinearLayout>
+
+</LinearLayout>
