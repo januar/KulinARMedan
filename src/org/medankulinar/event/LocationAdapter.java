@@ -61,7 +61,6 @@ public class LocationAdapter extends ArrayAdapter<Poi> {
 		drawerHolder.txt_kategori.setText("Kategori : " + item.getKategori());
 		
 		if (item.getImg() != null) {
-			Log.e("image", item.getImg());
 			InputStream stream = null;
 			try {
 				stream = new ByteArrayInputStream(Base64.decode(item.getImg().getBytes("UTF-8"), Base64.DEFAULT));

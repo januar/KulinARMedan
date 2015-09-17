@@ -1,8 +1,9 @@
 package org.medankulinar.event.api;
 
-import java.util.List;
+import java.io.Serializable;
 
-public class Poi {
+@SuppressWarnings("serial")
+public class Poi implements Serializable {
 	private int id;
 	private String tgl;
 	private String title;

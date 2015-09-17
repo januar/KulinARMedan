@@ -38,6 +38,7 @@ import org.medankulinar.data.DataSourceList;
 import org.medankulinar.data.DataSourceStorage;
 import org.medankulinar.event.ListEventActivity;
 import org.medankulinar.event.ListPoiActivity;
+import org.medankulinar.maps.MapViewActivity;
 import org.medankulinar.R;
 import org.medankulinar.R.drawable;
 import org.mixare.lib.gui.PaintScreen;
@@ -615,7 +616,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			break;
 		/* Map View */
 		case 3:
-			Intent intent2 = new Intent(MixView.this, MixMap.class);
+//			Intent intent2 = new Intent(MixView.this, MixMap.class);
+			Intent intent2 = new Intent(MixView.this, MapViewActivity.class);
 			startActivityForResult(intent2, 20);
 			break;
 		/* zoom level */

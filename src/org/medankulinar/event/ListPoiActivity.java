@@ -1,5 +1,6 @@
 package org.medankulinar.event;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,12 +9,15 @@ import org.medankulinar.R;
 import org.medankulinar.event.api.Poi;
 import com.google.gson.Gson;
 import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -34,7 +38,21 @@ public class ListPoiActivity extends ActionBarActivity {
 		adapter = new LocationAdapter(this, R.layout.location_view, dataList);
 		listView = (ListView) findViewById(R.id.list_location);
 		listView.setAdapter(adapter);
+		
+		listView.setOnItemClickListener(new OnItemClickListener() {
 
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				Poi entity = adapter.getItem(position);
+				Intent intent = new Intent(ListPoiActivity.this, LocationDetailActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putSerializable("poi", (Serializable) entity);
+				intent.putExtras(bundle);
+				startActivity(intent);
+			}
+		});
 		new RestApi().execute();
 	}
 

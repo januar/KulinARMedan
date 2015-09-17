@@ -89,5 +89,7 @@
     <string name="title_activity_list_poi">ListPoiActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_location_detail">LocationDetailActivity</string>
+    <string name="title_activity_map_view">MapViewActivity</string>
 
 </resources>
