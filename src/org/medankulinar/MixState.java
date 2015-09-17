@@ -42,6 +42,7 @@ public class MixState implements MixStateInterface{
 
 	private boolean detailsView;
 
+	//Handle click function of marker
 	public boolean handleEvent(MixContextInterface ctx, String onPress) {
 		if (onPress != null && onPress.startsWith("webpage")) {
 			try {
