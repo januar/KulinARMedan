@@ -9,6 +9,6 @@
 		<item>@string/NAVIGATION_MARKER</item>
 	</string-array>
 	<string-array name="defaultdatasources">
-	     <item>Traglopindo|http://traglopindoutama.com/nuga/gps.php|2|0|true</item>
+	     <item>MedanKulinAR|http://medankulinar-freepro.rhcloud.com/api/index/getlocation|2|0|true</item>
 	</string-array>
 </resources>

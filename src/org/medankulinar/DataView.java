@@ -98,7 +98,8 @@ public class DataView {
 	private float addX = 0, addY = 0;
 	
 	private List<Marker> markers;
-
+	
+	public static MixView activity;
 	/**
 	 * Constructor
 	 */

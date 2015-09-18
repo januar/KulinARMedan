@@ -28,6 +28,7 @@ package org.medankulinar;
 
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -38,6 +39,8 @@ import org.medankulinar.data.DataSourceList;
 import org.medankulinar.data.DataSourceStorage;
 import org.medankulinar.event.ListEventActivity;
 import org.medankulinar.event.ListPoiActivity;
+import org.medankulinar.event.LocationDetailActivity;
+import org.medankulinar.maps.MapRoutingActivity;
 import org.medankulinar.maps.MapViewActivity;
 import org.medankulinar.R;
 import org.medankulinar.R.drawable;
@@ -84,7 +87,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MixView extends Activity implements SensorEventListener, OnTouchListener {
+public class MixView extends Activity implements SensorEventListener, OnTouchListener, MixViewInterface {
 
 	private CameraSurface camScreen;
 	private AugmentedView augScreen;
@@ -129,6 +132,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				//getMixViewData().getMixContext().setDownloadManager(new DownloadManager(mixViewData.getMixContext()));
 				setdWindow(new PaintScreen());
 				setDataView(new DataView(getMixViewData().getMixContext()));
+				DataView.activity = this;
 
 				/* set the radius in data view to the last selected by the user */
 				setZoomLevel();
@@ -582,7 +586,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		return true;
 	}
-
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -983,6 +986,17 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		getMixViewData().getMixContext().getDownloadManager().switchOn();
 
+	}
+
+	@Override
+	public void startDetailLocation(String id) {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(this, LocationDetailActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("action", "fromAR");
+		bundle.putString("id", id);
+		intent.putExtras(bundle);
+		startActivity(intent);
 	};
 
 }

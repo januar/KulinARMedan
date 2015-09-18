@@ -18,11 +18,18 @@
  */
 package org.medankulinar;
 
+import java.io.Serializable;
+
+import org.medankulinar.event.LocationDetailActivity;
 import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.MixStateInterface;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.render.Matrix;
 import org.mixare.lib.render.MixVector;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 
 /**
  * This class calculates the bearing and pitch out of the angles
@@ -52,7 +59,19 @@ public class MixState implements MixStateInterface{
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-		} 
+		}else if(onPress != null && onPress.startsWith("id"))
+		{
+			try {
+				String id = MixUtils.parseAction(onPress);
+				if (id != "") {
+					MixViewInterface mixview = DataView.activity;
+					mixview.startDetailLocation(id);
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+		}
 		return true;
 	}
 

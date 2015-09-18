@@ -12,7 +12,7 @@ public class AppConfig {
 	public static final String SERVER = "http://medankulinar-freepro.rhcloud.com/api/";
 //	public static final String SERVER = "http://192.168.137.1/medankulinar/api/";
 	public static final String GET_LIST = "index/getlistpoi";
-	public static final String GET_DETAIL = "index/getdetail";
+	public static final String GET_DETAIL = "index/getDetailPoi";
 	public static final String GET_BY_KATEGORI = "index/getpoibykategori";
 	public static final String GET_KATEGORI = "index/getkategori";
 }

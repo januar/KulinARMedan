@@ -259,7 +259,11 @@ public abstract class LocalMarker implements Marker {
 		boolean evtHandled = false;
 
 		if (isClickValid(x, y)) {
-			evtHandled = state.handleEvent(ctx, URL);
+			//evtHandled = state.handleEvent(ctx, URL);
+			
+			/*this code to change event when marker click*/
+			String[] id = ID.split("##");
+			evtHandled = state.handleEvent(ctx, "id:"+id[0]);
 		}
 		return evtHandled;
 	}

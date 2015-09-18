@@ -4,11 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.http.NameValuePair;
 import org.medankulinar.R;
 import org.medankulinar.event.api.Poi;
 import com.google.gson.Gson;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,8 +26,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-@SuppressWarnings("deprecation")
-public class ListPoiActivity extends ActionBarActivity {
+public class ListPoiActivity extends AppCompatActivity {
 
 	LocationAdapter adapter;
 	List<Poi> dataList;
@@ -33,7 +36,8 @@ public class ListPoiActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list_poi);
-
+		setupActionBar();
+		
 		dataList = new ArrayList<Poi>();
 		adapter = new LocationAdapter(this, R.layout.location_view, dataList);
 		listView = (ListView) findViewById(R.id.list_location);
@@ -49,6 +53,7 @@ public class ListPoiActivity extends ActionBarActivity {
 				Intent intent = new Intent(ListPoiActivity.this, LocationDetailActivity.class);
 				Bundle bundle = new Bundle();
 				bundle.putSerializable("poi", (Serializable) entity);
+				bundle.putString("action", "fromList");
 				intent.putExtras(bundle);
 				startActivity(intent);
 			}
@@ -68,14 +73,33 @@ public class ListPoiActivity extends ActionBarActivity {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			//NavUtils.navigateUpFromSameTask(this);
+			finish();
 			return true;
+		case R.id.action_settings:
+			return true;
+		default:
+			break;
 		}
+		
 		return super.onOptionsItemSelected(item);
 	}
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		
+		ActionBar bar = getSupportActionBar();
+		int change = bar.getDisplayOptions() ^ ActionBar.DISPLAY_HOME_AS_UP;
+        bar.setDisplayOptions(change, ActionBar.DISPLAY_HOME_AS_UP);
+	}
 
-	public class RestApi extends AsyncTask<String, String, Boolean> {
+	private class RestApi extends AsyncTask<String, String, Boolean> {
 		private ProgressBar progressBar;
 		private List<Poi> dataList;
 
