@@ -20,6 +20,7 @@
 package org.medankulinar.data;
 
 import org.medankulinar.data.convert.DataConvertor;
+import org.medankulinar.MixView;
 import org.medankulinar.R;
 
 import android.annotation.SuppressLint;
@@ -47,7 +48,7 @@ import android.widget.TextView;
 	private String url;
 
 	public enum TYPE {
-		WIKIPEDIA, BUZZ, TWITTER, TRAGLOPINDO, OSM, MIXARE, ARENA
+		WIKIPEDIA, BUZZ, TWITTER, TRAGLOPINDO, OSM, MIXARE, ARENA, MEDANAR
 	};
 
 	public enum DISPLAY {
@@ -221,6 +222,12 @@ import android.widget.TextView;
 			case OSM:
 				ret += DataConvertor.getOSMBoundingBox(lat, lon, radius);
 				break;
+			
+			case MEDANAR:
+				ret += "?latitude=" + Double.toString(lat) + "&longitude="
+						+ Double.toString(lon) + "&altitude="
+						+ Double.toString(alt) + "&radius="
+						+ Double.toString(radius) + "&id_category=" + MixView.Category_ID;
 			}
 
 		}
