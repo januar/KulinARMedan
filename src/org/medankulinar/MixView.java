@@ -108,6 +108,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	/* string to name & access the preference file in the internal storage */
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
+	
+	public static int Category_ID = 11;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -609,6 +611,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			if (getDataView().getDataHandler().getMarkerCount() > 0) {
 				/*Intent intent = new Intent(MixView.this, ListEventActivity.class); */
 				Intent intent = new Intent(this, ListPoiActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putInt("id_category", Category_ID);
+				intent.putExtras(bundle);
 				startActivityForResult(intent, 42);
 			}
 			/* if the list is empty */

@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.medankulinar.R.id;
+import org.medankulinar.event.api.Location;
 import org.medankulinar.event.api.Poi;
 
 import android.app.Activity;
@@ -21,12 +22,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class LocationAdapter extends ArrayAdapter<Poi> {
+public class LocationAdapter extends ArrayAdapter<Location> {
 	Context context;
 	int layoutResID;
-	List<Poi> itemList;
+	List<Location> itemList;
 
-	public LocationAdapter(Context context, int resource, List<Poi> objects) {
+	public LocationAdapter(Context context, int resource, List<Location> objects) {
 		super(context, resource, objects);
 		// TODO Auto-generated constructor stub
 		this.context = context;
@@ -54,13 +55,13 @@ public class LocationAdapter extends ArrayAdapter<Poi> {
 			drawerHolder = (ItemHolder) view.getTag();
 		}
 
-		Poi item = (Poi) this.itemList.get(position);
+		Location item = (Location) this.itemList.get(position);
 		
-		drawerHolder.txt_location.setText(item.getTitle());
+		drawerHolder.txt_location.setText(item.getName());
 		drawerHolder.txt_address.setText(item.getAddress());
-		drawerHolder.txt_kategori.setText("Kategori : " + item.getKategori());
+		drawerHolder.txt_kategori.setText("Kategori : " + item.getCategory());
 		
-		if (item.getImg() != null) {
+		/*if (item.getImg() != null) {
 			InputStream stream = null;
 			try {
 				stream = new ByteArrayInputStream(Base64.decode(item.getImg().getBytes("UTF-8"), Base64.DEFAULT));
@@ -70,7 +71,7 @@ public class LocationAdapter extends ArrayAdapter<Poi> {
 			}
 			Bitmap decodeByte = BitmapFactory.decodeStream(stream);
 			drawerHolder.img_location.setImageBitmap(decodeByte);
-		}
+		}*/
 		
 		return view;
 	}

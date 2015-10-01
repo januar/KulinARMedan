@@ -66,9 +66,11 @@ public final class HttpTools {
 		String pageContent;
 		InputStream is = null;
 		if(!request.getSource().getUrl().startsWith("file://")){
-			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl() + request.getParams(), cr);
+//			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl() + request.getParams(), cr);
+			is = HttpTools.getHttpPOSTInputStream(request.getSource().getUrl(), request.getParams(), cr);
 		}else{
-			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl(), cr);
+//			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl(), cr);
+			is = HttpTools.getHttpPOSTInputStream(request.getSource().getUrl(), null, cr);
 		}
 		pageContent = HttpTools.getHttpInputString(is);
 		HttpTools.returnHttpInputStream(is);

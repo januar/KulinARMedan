@@ -6,9 +6,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONObject;
 import org.medankulinar.R;
+import org.medankulinar.event.api.Location;
 import org.medankulinar.event.api.Poi;
+
 import com.google.gson.Gson;
+
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -29,8 +34,9 @@ import android.widget.Toast;
 public class ListPoiActivity extends AppCompatActivity {
 
 	LocationAdapter adapter;
-	List<Poi> dataList;
+	List<Location> dataList;
 	ListView listView;
+	private int id_category;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,18 +44,21 @@ public class ListPoiActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_list_poi);
 		setupActionBar();
 		
-		dataList = new ArrayList<Poi>();
+		dataList = new ArrayList<Location>();
 		adapter = new LocationAdapter(this, R.layout.location_view, dataList);
 		listView = (ListView) findViewById(R.id.list_location);
 		listView.setAdapter(adapter);
 		
+		Intent intent = this.getIntent();
+		Bundle bundle = intent.getExtras();
+		id_category = bundle.getInt("id_category", 1);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
-				Poi entity = adapter.getItem(position);
+				Location entity = adapter.getItem(position);
 				Intent intent = new Intent(ListPoiActivity.this, LocationDetailActivity.class);
 				Bundle bundle = new Bundle();
 				bundle.putSerializable("poi", (Serializable) entity);
@@ -58,7 +67,7 @@ public class ListPoiActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
-		new RestApi().execute();
+		new RestApi().execute(Integer.toString(id_category));
 	}
 
 	@Override
@@ -101,7 +110,7 @@ public class ListPoiActivity extends AppCompatActivity {
 
 	private class RestApi extends AsyncTask<String, String, Boolean> {
 		private ProgressBar progressBar;
-		private List<Poi> dataList;
+		private List<Location> dataList;
 
 		public RestApi() {
 			this.progressBar = (ProgressBar) findViewById(R.id.inbox_progressbar);
@@ -111,6 +120,7 @@ public class ListPoiActivity extends AppCompatActivity {
 		protected Boolean doInBackground(String... args) {
 			// TODO Auto-generated method stub
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("id_category", args[0]));
 			String response = ApiRequest.makeHttpRequest(AppConfig.GET_LIST,
 					ApiRequest.GET, params);
 			if (response.equals("")) {
@@ -118,8 +128,8 @@ public class ListPoiActivity extends AppCompatActivity {
 			} else {
 				Gson gson = new Gson();
 				try {
-					Poi[] listPoi = gson.fromJson(response, Poi[].class);
-					dataList = Arrays.asList(listPoi);
+					Location[] listLocation = gson.fromJson(response, Location[].class);
+					dataList = Arrays.asList(listLocation);
 				} catch (Exception e) {
 					ApiRequest.LOG = "Bad request";
 					Log.e("RestApi", response);
