@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class LocationAdapter extends ArrayAdapter<Location> {
@@ -50,6 +52,7 @@ public class LocationAdapter extends ArrayAdapter<Location> {
 			drawerHolder.img_location = (ImageView)view.findViewById(id.location_image);
 			drawerHolder.txt_address = (TextView)view.findViewById(id.txt_address);
 			drawerHolder.txt_kategori = (TextView)view.findViewById(id.txt_kategori);
+			drawerHolder.progress_layout = (LinearLayout)view.findViewById(id.progress_image_layout);
 			view.setTag(drawerHolder);
 		} else {
 			drawerHolder = (ItemHolder) view.getTag();
@@ -60,6 +63,11 @@ public class LocationAdapter extends ArrayAdapter<Location> {
 		drawerHolder.txt_location.setText(item.getName());
 		drawerHolder.txt_address.setText(item.getAddress());
 		drawerHolder.txt_kategori.setText("Kategori : " + item.getCategory());
+		
+		if (item.getImageUrl() != null) {
+			if(item.getImageUrl().trim() != "")
+				new ImageAsyncTask(drawerHolder, item).execute(item.getImageUrl().trim());
+		}
 		
 		/*if (item.getImg() != null) {
 			InputStream stream = null;
@@ -76,10 +84,64 @@ public class LocationAdapter extends ArrayAdapter<Location> {
 		return view;
 	}
 	
+	private class ImageAsyncTask extends AsyncTask<String, String, Boolean>
+	{
+		private ItemHolder drawer;
+		private Location location;
+		
+		public ImageAsyncTask(ItemHolder drawer, Location location){
+			this.drawer = drawer;
+			this.location = location;
+		}
+
+		@Override
+		protected Boolean doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			String urldisplay = params[0];
+	        try {
+	            InputStream in = new java.net.URL(urldisplay).openStream();
+	            if (in != null) {
+					location.setImage(BitmapFactory.decodeStream(in));
+				} else {
+					return false;
+				}
+//	            mIcon11 = BitmapFactory.decodeStream(in);
+	            
+	        } catch (Exception e) {
+	            Log.e("Error", e.getMessage());
+	            e.printStackTrace();
+	            return false;
+	        }
+			
+			return true;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			drawer.img_location.setVisibility(View.INVISIBLE);
+			drawer.progress_layout.setVisibility(View.VISIBLE);
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			if (result) {
+				drawer.img_location.setImageBitmap(location.getImage());
+			}
+			
+			drawer.img_location.setVisibility(View.VISIBLE);
+			drawer.progress_layout.setVisibility(View.INVISIBLE);
+		}
+	}
+	
 	private static class ItemHolder{
 		TextView txt_location;
 		ImageView img_location;
 		TextView txt_address;
 		TextView txt_kategori;
+		LinearLayout progress_layout;
 	}
 }

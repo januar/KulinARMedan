@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import android.graphics.Bitmap;
 
+@SuppressWarnings("serial")
 public class Location implements Serializable{
 
 	private int id_location;
