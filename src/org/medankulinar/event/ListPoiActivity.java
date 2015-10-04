@@ -1,20 +1,15 @@
 package org.medankulinar.event;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
 import org.medankulinar.R;
+import org.medankulinar.R.layout;
 import org.medankulinar.event.api.Location;
-import org.medankulinar.event.api.Poi;
-
+import org.medankulinar.event.api.Location.LocationResult;
 import com.google.gson.Gson;
-
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -36,7 +32,11 @@ public class ListPoiActivity extends AppCompatActivity {
 	LocationAdapter adapter;
 	List<Location> dataList;
 	ListView listView;
+	public View footer_view;
 	private int id_category;
+	private int offset;
+	private int count_data;
+	private boolean is_load;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +52,11 @@ public class ListPoiActivity extends AppCompatActivity {
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
 		id_category = bundle.getInt("id_category", 1);
+		offset = 0;
+		is_load = false;
+		
+		footer_view = this.getLayoutInflater().inflate(layout.footer_view, null);
+		
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -61,13 +66,41 @@ public class ListPoiActivity extends AppCompatActivity {
 				Location entity = adapter.getItem(position);
 				Intent intent = new Intent(ListPoiActivity.this, LocationDetailActivity.class);
 				Bundle bundle = new Bundle();
-				bundle.putSerializable("poi", (Serializable) entity);
+				bundle.putParcelable("poi", entity);
 				bundle.putString("action", "fromList");
 				intent.putExtras(bundle);
 				startActivity(intent);
 			}
 		});
-		new RestApi().execute(Integer.toString(id_category));
+		
+		listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				// TODO Auto-generated method stub
+				if((totalItemCount - visibleItemCount) == firstVisibleItem && totalItemCount > 1){
+					if (!is_load) {
+						if((offset * 5) < count_data){
+							listView.addFooterView(footer_view);
+							new RestApi(false).execute(Integer.toString(id_category), Integer.toString(offset));
+							offset++;
+							is_load = true;
+						}
+					}
+				}
+			}
+		});
+		
+		
+		new RestApi(true).execute(Integer.toString(id_category), Integer.toString(offset));
+		offset++;
 	}
 
 	@Override
@@ -111,9 +144,11 @@ public class ListPoiActivity extends AppCompatActivity {
 	private class RestApi extends AsyncTask<String, String, Boolean> {
 		private ProgressBar progressBar;
 		private List<Location> dataList;
+		private boolean first;
 
-		public RestApi() {
+		public RestApi(boolean first) {
 			this.progressBar = (ProgressBar) findViewById(R.id.inbox_progressbar);
+			this.first = first;
 		}
 
 		@Override
@@ -121,6 +156,7 @@ public class ListPoiActivity extends AppCompatActivity {
 			// TODO Auto-generated method stub
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("id_category", args[0]));
+			params.add(new BasicNameValuePair("offset", args[1]));
 			String response = ApiRequest.makeHttpRequest(AppConfig.GET_LIST,
 					ApiRequest.GET, params);
 			if (response.equals("")) {
@@ -128,8 +164,10 @@ public class ListPoiActivity extends AppCompatActivity {
 			} else {
 				Gson gson = new Gson();
 				try {
-					Location[] listLocation = gson.fromJson(response, Location[].class);
-					dataList = Arrays.asList(listLocation);
+					LocationResult result = gson.fromJson(response, LocationResult.class);
+					count_data = result.count;
+					//Location[] listLocation = gson.fromJson(result.data, Location[].class);
+					dataList = Arrays.asList(result.data);
 				} catch (Exception e) {
 					ApiRequest.LOG = "Bad request";
 					Log.e("RestApi", response);
@@ -144,8 +182,10 @@ public class ListPoiActivity extends AppCompatActivity {
 		protected void onPreExecute() {
 			// TODO Auto-generated method stub
 			super.onPreExecute();
-			progressBar.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.INVISIBLE);
+			if (first) {
+				progressBar.setVisibility(View.VISIBLE);
+				listView.setVisibility(View.INVISIBLE);
+			}
 		}
 
 		@Override
@@ -158,8 +198,14 @@ public class ListPoiActivity extends AppCompatActivity {
 			}else{
 				Toast.makeText(getApplication(), ApiRequest.LOG, Toast.LENGTH_SHORT).show();
 			}
-			listView.setVisibility(View.VISIBLE);
-			progressBar.setVisibility(View.INVISIBLE);
+			
+			if (first) {
+				listView.setVisibility(View.VISIBLE);
+				progressBar.setVisibility(View.INVISIBLE);
+			}else{
+				listView.removeFooterView(footer_view);
+				is_load = false;
+			}
 		}
 	}
 }

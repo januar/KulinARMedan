@@ -4,10 +4,6 @@ import org.medankulinar.DataView;
 import org.medankulinar.MixView;
 import org.medankulinar.R;
 import org.medankulinar.R.id;
-import org.medankulinar.R.layout;
-import org.medankulinar.R.menu;
-import org.medankulinar.event.api.Poi;
-
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,7 +28,7 @@ public class MapRoutingActivity extends Activity implements RoutingListener {
 	private GoogleMap map;
 	private MapFragment mapFragment;
 	private DataView dataView;
-	private Poi poi;
+	private org.medankulinar.event.api.Location poi;
 	private LatLng startPoint;
 	private LatLng endPoint;
 	private Polyline polyline;
@@ -51,9 +47,9 @@ public class MapRoutingActivity extends Activity implements RoutingListener {
 		
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
-		poi = (Poi) bundle.getSerializable("poi");
+		poi = (org.medankulinar.event.api.Location) bundle.getParcelable("poi");
 		
-		endPoint = new LatLng(poi.getLat(), poi.getLon());
+		endPoint = new LatLng(poi.getLatitude(), poi.getLongitude());
 		
 		Routing routing = new Routing.Builder()
 				.travelMode(AbstractRouting.TravelMode.DRIVING)

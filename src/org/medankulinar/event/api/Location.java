@@ -1,11 +1,14 @@
 package org.medankulinar.event.api;
 
-import java.io.Serializable;
+import java.io.ByteArrayOutputStream;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Base64;
 
-@SuppressWarnings("serial")
-public class Location implements Serializable{
+public class Location implements Parcelable{
 
 	private int id_location;
 	private int id_category;
@@ -20,6 +23,28 @@ public class Location implements Serializable{
 	
 	public Location() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public Location(Parcel in)
+	{
+		String[] dataString = new String[6];
+		in.readStringArray(dataString);
+		this.category = dataString[0];
+		this.name = dataString[1];
+		this.description = dataString[2];
+		this.address = dataString[3];
+		this.image_url = dataString[4];
+		this.image = decodeBase64(dataString[5]);
+		
+		float[] dataFloat = new float[2];
+		in.readFloatArray(dataFloat);
+		this.longitude = dataFloat[0];
+		this.latitude = dataFloat[1];
+		
+		int[] dataInt = new int[2];
+		in.writeIntArray(dataInt);
+		this.id_location = dataInt[0];
+		this.id_category = dataInt[1];
 	}
 	
 	public void setId(int id) {
@@ -91,4 +116,51 @@ public class Location implements Serializable{
 	public Bitmap getImage() {
 		return this.image;
 	}
+	
+	public String encodeToBase64()
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		this.image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+	    byte[] b = baos.toByteArray();
+	    String imageEncoded = Base64.encodeToString(b,Base64.DEFAULT);
+	    
+	    return imageEncoded;
+	}
+	
+	public Bitmap decodeBase64(String input) 
+	{
+	    byte[] decodedByte = Base64.decode(input, Base64.DEFAULT);
+	    return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length); 
+	}
+
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		// TODO Auto-generated method stub
+		dest.writeStringArray(new String[]{this.category, this.name, this.description, this.address, this.image_url, this.encodeToBase64()});
+		dest.writeFloatArray(new float[] {this.longitude, this.latitude});
+		dest.writeIntArray(new int[]{this.id_location, this.id_category});
+//		dest.writeValue(this.image);
+	}
+	
+	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Location createFromParcel(Parcel in) {
+            return new Location(in);
+        }
+
+        public Location[] newArray(int size) {
+            return new Location[size];
+        }
+    };
+    
+    
+    public class LocationResult{
+    	public int count;
+    	public Location[] data;
+    }
 }

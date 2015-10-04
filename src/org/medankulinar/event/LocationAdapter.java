@@ -1,20 +1,14 @@
 package org.medankulinar.event;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
-
+import org.medankulinar.R;
 import org.medankulinar.R.id;
 import org.medankulinar.event.api.Location;
-import org.medankulinar.event.api.Poi;
-
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +22,7 @@ public class LocationAdapter extends ArrayAdapter<Location> {
 	Context context;
 	int layoutResID;
 	List<Location> itemList;
+	View view;
 
 	public LocationAdapter(Context context, int resource, List<Location> objects) {
 		super(context, resource, objects);
@@ -41,7 +36,7 @@ public class LocationAdapter extends ArrayAdapter<Location> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
 		ItemHolder drawerHolder;
-		View view = convertView;
+		view = convertView;
 
 		if (view == null) {
 			LayoutInflater inflater = ((Activity) context).getLayoutInflater();
@@ -64,9 +59,13 @@ public class LocationAdapter extends ArrayAdapter<Location> {
 		drawerHolder.txt_address.setText(item.getAddress());
 		drawerHolder.txt_kategori.setText("Kategori : " + item.getCategory());
 		
-		if (item.getImageUrl() != null) {
-			if(item.getImageUrl().trim() != "")
-				new ImageAsyncTask(drawerHolder, item).execute(item.getImageUrl().trim());
+		if(item.getImage() == null){
+			if (item.getImageUrl() != null) {
+				if(item.getImageUrl().trim() != "")
+					new ImageAsyncTask(drawerHolder, item).execute(item.getImageUrl().trim());
+			}
+		}else{
+			drawerHolder.img_location.setImageBitmap(item.getImage());
 		}
 		
 		/*if (item.getImg() != null) {
@@ -105,7 +104,6 @@ public class LocationAdapter extends ArrayAdapter<Location> {
 				} else {
 					return false;
 				}
-//	            mIcon11 = BitmapFactory.decodeStream(in);
 	            
 	        } catch (Exception e) {
 	            Log.e("Error", e.getMessage());
@@ -130,6 +128,8 @@ public class LocationAdapter extends ArrayAdapter<Location> {
 			super.onPostExecute(result);
 			if (result) {
 				drawer.img_location.setImageBitmap(location.getImage());
+			}else{
+				location.setImage(BitmapFactory.decodeResource(view.getResources(),R.drawable.thumbnail_default));
 			}
 			
 			drawer.img_location.setVisibility(View.VISIBLE);

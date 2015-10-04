@@ -26,11 +26,13 @@ public class PluginLoaderActivity extends Activity {
 	public static final int SCANNER_REQUEST_CODE = 0;
 	protected Handler exitHandler = null;
 	protected Runnable exitRunnable = null;
+	private boolean is_start;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		is_start = false;
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
 		DataSourceStorage.init(this);
@@ -41,7 +43,7 @@ public class PluginLoaderActivity extends Activity {
 	}
 
 	private void startDefaultSplashScreen() {
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -86,8 +88,12 @@ public class PluginLoaderActivity extends Activity {
 
 	private void startMixare() {
 		if (arePendingActivitiesFinished()) {
-			startActivity(new Intent(this, MixView.class));
-			finish();
+			//startActivity(new Intent(this, MixView.class));
+			if(!is_start){
+				startActivity(new Intent(this, CategoryActivity.class));
+				is_start = true;
+				finish();
+			}
 		}
 	}
 

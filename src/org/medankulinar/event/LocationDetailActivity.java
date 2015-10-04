@@ -11,7 +11,9 @@ import org.medankulinar.R;
 import org.medankulinar.R.id;
 import org.medankulinar.event.api.Location;
 import org.medankulinar.maps.MapRoutingActivity;
+
 import com.google.gson.Gson;
+
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +21,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,7 +68,7 @@ public class LocationDetailActivity extends AppCompatActivity {
 		
 		String action = bundle.getString("action");
 		if (action.equals("fromList")) {
-			poi = (Location) bundle.getSerializable("poi");
+			poi = (Location) bundle.getParcelable("poi");
 			txt_location.setText(poi.getName());
 			txt_address.setText(poi.getAddress());
 			txt_kategori.setText("Kategori : " + poi.getCategory());
@@ -86,9 +89,9 @@ public class LocationDetailActivity extends AppCompatActivity {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(LocationDetailActivity.this, MapRoutingActivity.class);
 				Bundle bundle = new Bundle();
-				bundle.putSerializable("poi", (Serializable) poi);
 				bundle.putString("action", "direction");
 				intent.putExtras(bundle);
+				intent.putExtra("poi", poi);
 				startActivity(intent);
 			}
 		});
@@ -154,7 +157,7 @@ public class LocationDetailActivity extends AppCompatActivity {
 			// TODO Auto-generated method stub
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("id", args[0]));
-			String response = ApiRequest.makeHttpRequest(AppConfig.GET_DETAIL,
+			String response = ApiRequest.makeHttpRequest(AppConfig.GET_DETAIL + args[0],
 					ApiRequest.GET, params);
 			if (response.equals("")) {
 				return false;
