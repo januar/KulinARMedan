@@ -28,28 +28,35 @@ package org.medankulinar;
 
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
 import org.medankulinar.data.DataHandler;
 import org.medankulinar.data.DataSourceList;
 import org.medankulinar.data.DataSourceStorage;
-import org.medankulinar.event.ListEventActivity;
+import org.medankulinar.event.ApiRequest;
+import org.medankulinar.event.AppConfig;
 import org.medankulinar.event.ListPoiActivity;
 import org.medankulinar.event.LocationDetailActivity;
-import org.medankulinar.maps.MapRoutingActivity;
+import org.medankulinar.event.api.Category;
 import org.medankulinar.maps.MapViewActivity;
 import org.medankulinar.R;
 import org.medankulinar.R.drawable;
+import org.medankulinar.R.id;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.marker.Marker;
 import org.mixare.lib.render.Matrix;
 
+import com.google.gson.Gson;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.app.AlertDialog.Builder;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -65,6 +72,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -79,10 +87,16 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,6 +110,17 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private static PaintScreen dWindow;
 	private static DataView dataView;
 	private boolean fError;
+	
+	// view object
+	private ImageButton btnCategory;
+	private ImageButton btnListView;
+	private ImageButton btnMapView;
+	private ImageButton btnRadius;
+	private ImageButton btnAbout;
+	
+	public List<Category> dataList;
+	public CategoryAdapter adapter;
+	public AlertDialog categoryDialog;
 
 	//----------
     private MixViewDataHolder mixViewData  ;
@@ -114,20 +139,118 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//MixView.CONTEXT = this;
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.mix_view);
 		try {
+			btnCategory = (ImageButton)findViewById(id.btn_category);
+			btnListView = (ImageButton)findViewById(id.btn_list_view);
+			btnMapView = (ImageButton)findViewById(id.btn_map_view);
+			btnRadius = (ImageButton)findViewById(id.btn_radius);
+			btnAbout = (ImageButton)findViewById(id.btn_about);
 			
-			Intent intent = this.getIntent();
-			Bundle bundle = intent.getExtras();
-			Category_ID = bundle.getInt("id_category", 1);
-						
+			dataList = new ArrayList<Category>();
+			adapter = new CategoryAdapter(MixView.this, R.layout.category_item, dataList);
+			final ListView listView = new ListView(this);
+			listView.setAdapter(adapter);
+			
+			categoryDialog = new AlertDialog.Builder(MixView.this).create();
+			
+			listView.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					// TODO Auto-generated method stub
+					Category entity = adapter.getItem(position);
+					Category_ID = entity.getIdCategory();
+					categoryDialog.dismiss();
+					refresh();
+					repaint();
+					Toast.makeText(getApplication(), "Selected " + entity.getCategory(), Toast.LENGTH_SHORT).show();
+				}
+			});
+			
+			
+			
+			btnCategory.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					/*if (listView.getParent() != null) {
+						((ViewGroup)listView.getParent()).removeView(listView);
+						listView.setAdapter(adapter);
+						adapter.notifyDataSetChanged();
+					}*/
+					
+					if (dataList.size() <= 0) {
+						categoryDialog.setTitle("Select category");
+						categoryDialog.setView(listView);
+						new RestApi(MixView.this).execute();
+					}else{
+						categoryDialog.setTitle("Select category");
+						categoryDialog.setView(listView);
+						categoryDialog.show();
+					}
+				}
+			});
+			
+			btnListView.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					if (getDataView().getDataHandler().getMarkerCount() > 0) {
+						/*Intent intent = new Intent(MixView.this, ListEventActivity.class); */
+						Intent intent = new Intent(MixView.this, ListPoiActivity.class);
+						Bundle bundle = new Bundle();
+						bundle.putInt("id_category", Category_ID);
+						intent.putExtras(bundle);
+						startActivityForResult(intent, 42);
+					}
+					/* if the list is empty */
+					else {
+						Toast.makeText(MixView.this, R.string.empty_list, Toast.LENGTH_LONG)
+								.show();
+					}
+				}
+			});
+			
+			btnMapView.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					Intent intent = new Intent(MixView.this, MapViewActivity.class);
+					startActivityForResult(intent, 20);
+				}
+			});
+			
+			btnRadius.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					getMixViewData().getMyZoomBar().setVisibility(View.VISIBLE);
+					getMixViewData().setZoomProgress(getMixViewData().getMyZoomBar()
+							.getProgress());
+				}
+			});
+			
+			btnAbout.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
 			handleIntent(getIntent());
 
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			getMixViewData().setmWakeLock(pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag"));
 
 			killOnError();
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 			maintainCamera();
 			maintainAugmentR();
@@ -225,6 +348,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
 
 		try {
 			this.getMixViewData().getmWakeLock().acquire();
@@ -390,9 +514,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 */
 	private void maintainCamera() {
 		if (camScreen == null){
-		camScreen = new CameraSurface(this);
+//		camScreen = new CameraSurface(this);
+			camScreen = (CameraSurface)findViewById(R.id.camScreen);
 		}
-		setContentView(camScreen);
+		//setContentView(camScreen);
 	}
 	
 	/**
@@ -401,6 +526,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private void maintainAugmentR() {
 		if (augScreen == null ){
 		augScreen = new AugmentedView(this);
+		}
+		if (augScreen.getParent() != null) {
+			((ViewGroup)augScreen.getParent()).removeView(augScreen);
 		}
 		addContentView(augScreen, new LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -555,7 +683,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		frameLayout.setMinimumWidth(3000);
 		frameLayout.addView(getMixViewData().getMyZoomBar());
-		frameLayout.setPadding(10, 0, 10, 10);
+		frameLayout.setPadding(10, 0, 10, 80);
 		return frameLayout;
 	}
 	
@@ -566,7 +694,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	public boolean onCreateOptionsMenu(Menu menu) {
 		int base = Menu.FIRST;
 		/* define the first */
-		MenuItem item1 = menu.add(base, base, base,
+		/*MenuItem item1 = menu.add(base, base, base,
 				getString(R.string.menu_item_1));
 		MenuItem item2 = menu.add(base, base + 1, base + 1,
 				getString(R.string.menu_item_2));
@@ -579,16 +707,16 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		MenuItem item6 = menu.add(base, base + 5, base + 5,
 				getString(R.string.menu_item_6));
 		MenuItem item7 = menu.add(base, base + 6, base + 6,
-				getString(R.string.menu_item_7));
+				getString(R.string.menu_item_7));*/
 
 		/* assign icons to the menu items */
-		item1.setIcon(drawable.category);
+		/*item1.setIcon(drawable.category);
 		item2.setIcon(drawable.listview);
 		item3.setIcon(drawable.mapview);
 		item4.setIcon(drawable.zoom);
 		item5.setIcon(drawable.search);
 		item6.setIcon(drawable.help);
-		item7.setIcon(drawable.about);
+		item7.setIcon(drawable.about);*/
 
 		return true;
 	}
@@ -1015,158 +1143,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 }
 
 
-/**
- * @author daniele
- *
- */
-class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
-	MixView app;
-	SurfaceHolder holder;
-	Camera camera;
-
-	CameraSurface(Context context) {
-		super(context);
-
-		try {
-			app = (MixView) context;
-
-			holder = getHolder();
-			holder.addCallback(this);
-			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		} catch (Exception ex) {
-
-		}
-	}
-
-	public void surfaceCreated(SurfaceHolder holder) {
-		try {
-			if (camera != null) {
-				try {
-					camera.stopPreview();
-				} catch (Exception ignore) {
-				}
-				try {
-					camera.release();
-				} catch (Exception ignore) {
-				}
-				camera = null;
-			}
-
-			camera = Camera.open();
-			camera.setPreviewDisplay(holder);
-		} catch (Exception ex) {
-			try {
-				if (camera != null) {
-					try {
-						camera.stopPreview();
-					} catch (Exception ignore) {
-					}
-					try {
-						camera.release();
-					} catch (Exception ignore) {
-					}
-					camera = null;
-				}
-			} catch (Exception ignore) {
-
-			}
-		}
-	}
-
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		try {
-			if (camera != null) {
-				try {
-					camera.stopPreview();
-				} catch (Exception ignore) {
-				}
-				try {
-					camera.release();
-				} catch (Exception ignore) {
-				}
-				camera = null;
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-
-	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		try {
-			Camera.Parameters parameters = camera.getParameters();
-			try {
-				List<Camera.Size> supportedSizes = null;
-				// On older devices (<1.6) the following will fail
-				// the camera will work nevertheless
-				supportedSizes = Compatibility.getSupportedPreviewSizes(parameters);
-
-				// preview form factor
-				float ff = (float) w / h;
-				Log.d("Mixare", "Screen res: w:" + w + " h:" + h
-						+ " aspect ratio:" + ff);
-
-				// holder for the best form factor and size
-				float bff = 0;
-				int bestw = 0;
-				int besth = 0;
-				Iterator<Camera.Size> itr = supportedSizes.iterator();
-
-				// we look for the best preview size, it has to be the closest
-				// to the
-				// screen form factor, and be less wide than the screen itself
-				// the latter requirement is because the HTC Hero with update
-				// 2.1 will
-				// report camera preview sizes larger than the screen, and it
-				// will fail
-				// to initialize the camera
-				// other devices could work with previews larger than the screen
-				// though
-				while (itr.hasNext()) {
-					Camera.Size element = itr.next();
-					// current form factor
-					float cff = (float) element.width / element.height;
-					// check if the current element is a candidate to replace
-					// the best match so far
-					// current form factor should be closer to the bff
-					// preview width should be less than screen width
-					// preview width should be more than current bestw
-					// this combination will ensure that the highest resolution
-					// will win
-					Log.d("Mixare", "Candidate camera element: w:"
-							+ element.width + " h:" + element.height
-							+ " aspect ratio:" + cff);
-					if ((ff - cff <= ff - bff) && (element.width <= w)
-							&& (element.width >= bestw)) {
-						bff = cff;
-						bestw = element.width;
-						besth = element.height;
-					}
-				}
-				Log.d("Mixare", "Chosen camera element: w:" + bestw + " h:"
-						+ besth + " aspect ratio:" + bff);
-				// Some Samsung phones will end up with bestw and besth = 0
-				// because their minimum preview size is bigger then the screen
-				// size.
-				// In this case, we use the default values: 480x320
-				if ((bestw == 0) || (besth == 0)) {
-					Log.d("Mixare", "Using default camera parameters!");
-					bestw = 480;
-					besth = 320;
-				}
-				parameters.setPreviewSize(bestw, besth);
-			} catch (Exception ex) {
-				parameters.setPreviewSize(480, 320);
-			}
-
-			camera.setParameters(parameters);
-			camera.startPreview();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-}
-
 class AugmentedView extends View {
 	MixView app;
 	int xSearch = 200;
@@ -1492,5 +1468,64 @@ class MixViewDataHolder {
 
 	public void setSearchNotificationTxt(TextView searchNotificationTxt) {
 		this.searchNotificationTxt = searchNotificationTxt;
+	}
+}
+
+class RestApi extends AsyncTask<String, String, Boolean> {
+	private MixView context;
+	private ProgressDialog progressDialog;
+	private List<Category> dataList;
+
+	public RestApi(MixView context) {
+		this.context = context;
+		this.progressDialog = new ProgressDialog(context);
+	}
+
+	@Override
+	protected Boolean doInBackground(String... args) {
+		// TODO Auto-generated method stub
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		String response = ApiRequest.makeHttpRequest(AppConfig.GET_CATEGORY,
+				ApiRequest.GET, params);
+		if (response.equals("")) {
+			return false;
+		} else {
+			Gson gson = new Gson();
+			try {
+				Category[] result = gson.fromJson(response, Category[].class);
+				dataList = Arrays.asList(result);
+			} catch (Exception e) {
+				ApiRequest.LOG = "Bad request";
+				Log.e("RestApi", response);
+				Log.e("RestApi", e.getMessage());
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	protected void onPreExecute() {
+		// TODO Auto-generated method stub
+		super.onPreExecute();
+		this.progressDialog.setCancelable(false);
+		progressDialog.setMessage("loading ...");
+		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		progressDialog.show();
+	}
+
+	@Override
+	protected void onPostExecute(Boolean result) {
+		// TODO Auto-generated method stub
+		super.onPostExecute(result);
+		if (result) {
+			context.dataList = dataList;
+			context.adapter.addAll(dataList);
+			context.adapter.notifyDataSetChanged();
+			context.categoryDialog.show();
+		}else{
+			Toast.makeText(this.context, ApiRequest.LOG, Toast.LENGTH_SHORT).show();
+		}
+		progressDialog.hide();
 	}
 }

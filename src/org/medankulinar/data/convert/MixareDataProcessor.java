@@ -30,6 +30,7 @@ import org.medankulinar.data.DataHandler;
 import org.mixare.lib.HtmlUnescape;
 import org.mixare.lib.marker.Marker;
 
+import android.graphics.Color;
 import android.util.Log;
 
 /**

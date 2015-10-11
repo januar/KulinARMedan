@@ -20,6 +20,7 @@ package org.medankulinar;
 
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
+import java.util.Random;
 
 import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.MixStateInterface;
@@ -36,6 +37,7 @@ import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.Location;
 
 /**
@@ -56,6 +58,7 @@ public abstract class LocalMarker implements Marker {
 	protected double distance;
 	// The marker color
 	private int colour;
+	private int[] listColor;
 	
 	private boolean active;
 
@@ -89,7 +92,27 @@ public abstract class LocalMarker implements Marker {
 		this.colour = colour;
 
 		this.ID = id + "##" + type + "##" + title;
-
+		
+		
+		/* set default list color for random */
+		listColor = new int[14];
+		listColor[0] = Color.parseColor("#F44336"); //red
+		listColor[1] = Color.parseColor("#E91E63"); //pink
+		listColor[2] = Color.parseColor("#9C27B0"); //purple
+		listColor[3] = Color.parseColor("#673AB7"); //deep purple
+		listColor[4] = Color.parseColor("#3F51B5"); //indigo
+		listColor[5] = Color.parseColor("#2196F3"); //blue
+		listColor[6] = Color.parseColor("#03A9F4"); //light blue
+		listColor[7] = Color.parseColor("#009688"); //teal
+		listColor[8] = Color.parseColor("#4CAF50"); //green
+		listColor[9] = Color.parseColor("#8BC34A"); //light green
+		listColor[10] = Color.parseColor("#CDDC39"); //lime
+		listColor[11] = Color.parseColor("#FFEB3B"); // yellow
+		listColor[12] = Color.parseColor("#FF9800"); // orange
+		listColor[13] = Color.parseColor("#FF5722"); //deep orange
+		
+		Random rnd = new Random();
+		this.colour = listColor[rnd.nextInt(13)];
 	}
 
 
