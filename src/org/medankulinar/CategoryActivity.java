@@ -109,11 +109,11 @@ public class CategoryActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	public class CategoryAdapter extends ArrayAdapter<Category>{
-		Context context;
-		int layoutResID;
-		List<Category> itemList;
-		View view;
+	public  class CategoryAdapter extends ArrayAdapter<Category>{
+		private Context context;
+		private int layoutResID;
+		private List<Category> itemList;
+		private View view;
 		
 		public CategoryAdapter(Context context, int resource,
 				List<Category> objects) {
@@ -217,7 +217,7 @@ public class CategoryActivity extends AppCompatActivity {
 		}
 	}
 	
-	private static class ItemHolder{
+	public static class ItemHolder{
 		TextView txt_category;
 		ImageView img_category;
 	}

@@ -5,6 +5,7 @@
     <color name="primary">#009688</color>
     <color name="primary_dark">#00796B</color>
     <color name="primary_light">#4DB6AC</color>
+    <color name="primary_light_abt">#EFEFEF</color>
     <color name="accent">#607D8B</color>
     <color name="primary_text">#FAFAFA</color>
     <color name="secondary_text">#EEEEEE</color>
